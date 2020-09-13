@@ -8,24 +8,30 @@ using System;
 using System.Collections.Generic;
 
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 using PetShop.DBAccess;
-using PetShop.Model;
-using Order = PetShop.DBAccess.DataModel.Order;
 using Product = PetShop.Model.Product;
 
 namespace PetShop.Business
 {
-    public class ProductService 
+    public class ProductService : IProductService
     {
+        private readonly IConfiguration _configuration;
+
+        public ProductService(IConfiguration configuration)
+        {
+            this._configuration = configuration;
+        }
+
         public IList<Product> GetData()
         {
-            using (var context = new PetShopContext())
+            using (var context = new PetShopContext(this._configuration))
             {
                 var query = from product in context.Products
                             select
                                 new Model.Product
                                 {
-                                    ProductId =  product.ProductId,
+                                    ProductId = product.ProductId,
                                     ProductName = product.ProductName,
                                     AvailableQuantity = product.Quantity
                                 };
@@ -37,13 +43,13 @@ namespace PetShop.Business
         {
             var dbProduct = new DBAccess.DataModel.Product
             {
- 
+
                 ProductId = product.ProductId == Guid.Empty ? Guid.NewGuid() : product.ProductId,
                 ProductName = product.ProductName,
                 Quantity = product.AvailableQuantity
             };
 
-            using (var context = new PetShopContext())
+            using (var context = new PetShopContext(this._configuration))
             {
                 context.Products.Add(dbProduct);
                 context.SaveChanges();

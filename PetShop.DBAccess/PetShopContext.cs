@@ -6,15 +6,12 @@ namespace PetShop.DBAccess
 {
     public class PetShopContext : DbContext
     {
-        //private readonly IConfiguration _configuration;
-        //public PetShopContext(IConfiguration configuration)
-        //{
-        //    this._configuration = configuration;
-        //}
-        public PetShopContext()
+        private readonly IConfiguration _configuration;
+
+        public PetShopContext(IConfiguration configuration)
             : base()
         {
-
+            this._configuration = configuration;
         }
 
         public DbSet<Product> Products { get; set; }
@@ -24,9 +21,9 @@ namespace PetShop.DBAccess
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer(_configuration.GetValue<string>("DbConnectionString:DefaultConnection"));
-            optionsBuilder.UseSqlServer(
-                "Server=tcp:kedaworkshop.database.windows.net,1433;Initial Catalog=petshop2019;Persist Security Info=False;User ID=petshop2019;Password=BGSoXD7138EQ;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=0;");
+            optionsBuilder.UseSqlServer(_configuration.GetValue<string>("DbConnectionString"));
+            // optionsBuilder.UseSqlServer(
+            //     "Server=tcp:kedaworkshop.database.windows.net,1433;Initial Catalog=petshop2019;Persist Security Info=False;User ID=petshop2019;Password=BGSoXD7138EQ;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=0;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -7,29 +7,32 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PetShop.Model;
 using PetShop.Business;
+using Microsoft.Extensions.Configuration;
 
 namespace PetShop.Products
 {
-    public static class Products
+    public class Products
     {
+        private IProductService _productService;
+        private IConfiguration _configuration;
+        public Products(IProductService productService, IConfiguration configuration)
+        {
+            _configuration = configuration;
+            _productService = productService;
+        }
+
         [FunctionName("GetProducts")]
-        public static IEnumerable<Product> GetProducts(
+        public IEnumerable<Product> GetProducts(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "product")] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-
-            // string requestBody = new StreamReader(req.Body).ReadToEnd();
-            // log.LogInformation("Input:" + requestBody);
-            // Product products = JsonConvert.DeserializeObject<Product>(requestBody);
-
-            var productService = new ProductService();
-            return productService.GetData();
+            return _productService.GetData();
         }
 
         [FunctionName("SaveProducts")]
-        public static bool SaveProducts(
+        public bool SaveProducts(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "product")] HttpRequest req,
             ILogger log)
         {
@@ -38,9 +41,8 @@ namespace PetShop.Products
             string requestBody = new StreamReader(req.Body).ReadToEnd();
             log.LogInformation("Input:" + requestBody);
             Product product = JsonConvert.DeserializeObject<Product>(requestBody);
-
-            var productService = new ProductService();
-            return productService.AddProduct(product);
+            
+            return _productService.AddProduct(product);
         }
     }
 }

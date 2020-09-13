@@ -5,15 +5,21 @@
 #endregion
 
 using System;
-
+using Microsoft.Extensions.Configuration;
 using PetShop.DBAccess;
 using Order = PetShop.DBAccess.DataModel;
 
 namespace PetShop.Business
 {
-    public class OrderService
+    public class OrderService : IOrderService
     {
 
+        private readonly IConfiguration _configuration;
+
+        public OrderService(IConfiguration configuration)
+        {
+            this._configuration = configuration;
+        }
 
         public bool SaveData(Model.Order order)
         {
@@ -25,7 +31,7 @@ namespace PetShop.Business
                 Quantity = order.Quantity
             };
 
-            using (var context = new PetShopContext())
+            using (var context = new PetShopContext(this._configuration))
             {
                 context.Orders.Add(orderData);
                 var product = context.Products.Find(order.ProductId);
